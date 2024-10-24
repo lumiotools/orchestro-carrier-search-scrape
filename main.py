@@ -27,7 +27,7 @@ while True:
     response = query_engine.query(query)
     sources = []
     for node in response.source_nodes:
-        sources.append({"url": node.metadata["URL"], "score": node.score})
+        sources.append({"url": node.metadata["url"], "score": node.score})
 
     print("\nResponse: "+str(response))
     print("\nSources: " + str(sources))
