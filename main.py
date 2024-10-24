@@ -6,14 +6,14 @@ load_dotenv()
 
 data = []
 
-with open('data.json', 'r', encoding='utf-8') as f:
+with open('landingPagesData.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
 
 documents = []
 for entry in data:
     # Create a Document with 'text' as content, and 'extra_info' like URL
     document = Document(text=entry['text'],
-                        extra_info=entry.get('extra_info', {}))
+                        extra_info={"url": entry['url']})
     documents.append(document)
 
 # Create the index using from_documents with a proper list of Document objects

@@ -40,7 +40,7 @@ for idx, url in enumerate(websiteUrls):
         for doc in documents:
             document_data = {
                 'text': doc.text,
-                'extra_info': doc.extra_info
+                'url': url
             }
             existing_data.append(document_data)
 
