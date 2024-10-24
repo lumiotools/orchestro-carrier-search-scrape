@@ -9,7 +9,6 @@ def extractSheet1Data():
     df = df[321].dropna()
     urls=[]
     for data in df:
-         print(data)
          urls.append(data)
     return urls
 

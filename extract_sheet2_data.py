@@ -6,5 +6,5 @@ def extractSheet2Data():
     urls = []
     print()
     for data in df["Links"]:
-        urls.append(data.split("\xa0-\xa0")[1])
+        urls.append("https://"+data.split("\xa0-\xa0")[1])
     return urls
