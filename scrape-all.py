@@ -5,13 +5,23 @@ import json
 import os
 import re
 
-
 loader = BeautifulSoupWebReader()
 
 # Combine URLs from both sheets
-websiteUrls = extractSheet1Data() + extractSheet2Data()
+originalUrls = extractSheet1Data() + extractSheet2Data()
 
-print("Total URLs to fetch:", len(websiteUrls))
+pagesUrls = []
+
+commonPages = ["/services", "/pricing", "/about",
+               "/blog", "/contact", "/home", "/faq"]
+
+for url in originalUrls:
+    pagesUrls.append(url)
+    for page in commonPages:
+        pagesUrls.append(url + page)
+
+
+print("Total URLs to fetch:", len(pagesUrls))
 
 # Function to read and load existing data from data.json, or return an empty list if the file doesn't exist
 
@@ -27,15 +37,19 @@ def read_existing_data(file_path):
 
 
 # Path to the JSON file
-json_file = 'data.json'
+json_file = 'all_pages_data.json'
 
 # Iterate over each URL and fetch the content individually
-for idx, url in enumerate(websiteUrls):
-    print(f"Fetching {idx + 1} of {len(websiteUrls)} documents")
+for idx, url in enumerate(pagesUrls):
+    print(f"Fetching {idx + 1} of {len(pagesUrls)} pages")
 
     try:
         # Fetch the data from the URL
         documents = loader.load_data(urls=[url])
+
+        if str(documents[0].text).find("404") != -1:
+            print(f"Error occurred while fetching {url}: 404")
+            continue
 
         # Read the existing data from data.json
         existing_data = read_existing_data(json_file)
@@ -62,4 +76,4 @@ for idx, url in enumerate(websiteUrls):
         print(f"Error occurred while fetching {url}: {e}")
         continue
 
-print("Documents saved to data.json")
+print("Documents saved to all_pages_data.json")
