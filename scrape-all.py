@@ -20,6 +20,7 @@ commonPages = ["/company", "/about-us", "/summary"]
 
 
 for url in originalUrls:
+    url=url.strip('/')
     pagesUrls.append(url)
     for page in commonPages:
         pagesUrls.append(url + page)
@@ -76,9 +77,14 @@ for idx, url in enumerate(pagesUrls):
 
         print(f"Fetched and saved {url}")
 
-    except Exception as e:
+    except (json.JSONDecodeError, OSError) as e:
         # Print error message and continue to the next URL
         print(f"Error occurred while fetching {url}: {e}")
         continue
+    except Exception as e:  # Catch all other exceptions
+        print(f"An unexpected error occurred while fetching {url}: {e}")
+        continue
+    # finally:
+    #     continue
 
 print("Documents saved to all_pages_data.json")
