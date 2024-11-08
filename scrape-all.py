@@ -15,8 +15,9 @@ pagesUrls = []
 # commonPages = ["/services", "/pricing", "/about",
 #                "/blog", "/contact", "/home", "/faq",
 #                "/company", "/about-us", "/summary"]
-# commonPages = ["/company", "/about-us", "/summary"]
-commonPages = []
+
+commonPages = ["/company", "/about-us", "/summary"]
+
 
 for url in originalUrls:
     pagesUrls.append(url)
