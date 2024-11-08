@@ -47,12 +47,16 @@ json_file = 'data_1.json'
 # Iterate over each URL and fetch the content individually
 for idx, url in enumerate(pagesUrls):
     print(f"Fetching {idx + 1} of {len(pagesUrls)} pages")
+    if "www.ups.com" in url:
+        continue
+
+    url = re.sub(r'(?<!:)/{2,}', '/', url)
 
     try:
         # Fetch the data from the URL
         documents = loader.load_data(urls=[url])
 
-        if str(documents[0].text).find("404") != -1 or str(documents[0].text).find("403") != -1 or str(documents[0].text).find("Page Not Found") != -1 :
+        if str(documents[0].text).find("404") != -1 or str(documents[0].text).find("403") != -1 or str(documents[0].text).find("Not Found") != -1:
             print(f"Error occurred while fetching {url}: 404")
             continue
 
