@@ -12,8 +12,11 @@ originalUrls = extractSheet1Data() + extractSheet2Data()
 
 pagesUrls = []
 
-commonPages = ["/services", "/pricing", "/about",
-               "/blog", "/contact", "/home", "/faq"]
+# commonPages = ["/services", "/pricing", "/about",
+#                "/blog", "/contact", "/home", "/faq",
+#                "/company", "/about-us", "/summary"]
+# commonPages = ["/company", "/about-us", "/summary"]
+commonPages = []
 
 for url in originalUrls:
     pagesUrls.append(url)
@@ -37,7 +40,8 @@ def read_existing_data(file_path):
 
 
 # Path to the JSON file
-json_file = 'all_pages_data.json'
+#json_file = 'all_pages_data.json'
+json_file = 'data_1.json'
 
 # Iterate over each URL and fetch the content individually
 for idx, url in enumerate(pagesUrls):
@@ -47,7 +51,7 @@ for idx, url in enumerate(pagesUrls):
         # Fetch the data from the URL
         documents = loader.load_data(urls=[url])
 
-        if str(documents[0].text).find("404") != -1:
+        if str(documents[0].text).find("404") != -1 or str(documents[0].text).find("403") != -1 or str(documents[0].text).find("Page Not Found") != -1 :
             print(f"Error occurred while fetching {url}: 404")
             continue
 
