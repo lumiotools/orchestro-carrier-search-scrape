@@ -12,9 +12,11 @@ def read_existing_data(file_path):
     return []
 
 
-existing_data = read_existing_data("data_2.json")
+existing_data = read_existing_data("data_1.json")
 
 existing_data = [item for item in existing_data if item.get("text")]
+
+existing_data = [item for item in existing_data if not "not found" in item.get("text").lower()]
 
 for data in existing_data:
     cleaned_text = "\n".join(
@@ -22,6 +24,6 @@ for data in existing_data:
     )
     data['text'] = cleaned_text
     
-with open("cleaned_data_2.json", 'w', encoding='utf-8') as f:
+with open("cleaned_data_1.json", 'w', encoding='utf-8') as f:
     json.dump(existing_data, f, ensure_ascii=False, indent=4)
 print("Data cleaned and saved to cleaned_data_2.json")
