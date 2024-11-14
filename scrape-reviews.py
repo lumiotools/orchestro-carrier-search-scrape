@@ -1,11 +1,10 @@
 from extract_sheet1_data import extractSheet1Data
 from extract_sheet2_data import extractSheet2Data
-from llama_index.readers.web import BeautifulSoupWebReader
+from bs4 import BeautifulSoup
+import requests
 import json
 import os
-import re
 
-loader = BeautifulSoupWebReader()
 
 # Combine URLs from both sheets
 originalUrls = extractSheet1Data() + extractSheet2Data()
@@ -14,24 +13,15 @@ baseUrl = "https://www.trustpilot.com/review/"
 
 pagesUrls = []
 
-# commonPages = ["/services", "/pricing", "/about",
-#                "/blog", "/contact", "/home", "/faq",
-#                "/company", "/about-us", "/summary"]
-
-# commonPages = ["/company", "/about-us", "/summary"]
-
 
 for url in originalUrls:
     url = url.strip('/').replace("https://", "").replace("http://", "")
     pagesUrls.append(baseUrl+url)
     pagesUrls.append(baseUrl+url+"?page=2")
     pagesUrls.append(baseUrl+url+"?page=3")
-    # for page in commonPages:
-    #     pagesUrls.append(url + page)
 
 
 print("Total URLs to fetch:", len(pagesUrls))
-print(pagesUrls)
 
 # Function to read and load existing data from data.json, or return an empty list if the file doesn't exist
 
@@ -48,37 +38,82 @@ def read_existing_data(file_path):
 
 # Path to the JSON file
 # json_file = 'all_pages_data.json'
-json_file = 'reviews_scraped_data.json'
+json_file = 'structured_reviews_scraped_data.json'
 
 # Iterate over each URL and fetch the content individually
 for idx, url in enumerate(pagesUrls):
+    
     print(f"Fetching {idx + 1} of {len(pagesUrls)} pages")
 
     try:
         # Fetch the data from the URL
-        documents = loader.load_data(urls=[url])
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        reviews_data = []
+        review_cards = soup.find_all(
+            'article', class_='styles_reviewCard__hcAvl')
 
-        if str(documents[0].text).find("404") != -1 or str(documents[0].text).find("403") != -1 or str(documents[0].text).find("not be found") != -1:
-            print(f"Error occurred while fetching {url}: 404")
-            continue
+        for review in review_cards:
+            # Extract reviewer name
+            reviewer_name_tag = review.find(
+                'span', {'data-consumer-name-typography': 'true'})
+            reviewer_name = reviewer_name_tag.text.strip() if reviewer_name_tag else "Unknown"
 
-        # Read the existing data from data.json
+            # Extract reviewer country
+            country_tag = review.find(
+                'span', {'data-consumer-country-typography': 'true'})
+            reviewer_country = country_tag.text.strip() if country_tag else "Unknown"
+
+            # Extract review rating
+            rating_tag = review.find(
+                'div', {'data-service-review-rating': True})
+            rating = rating_tag['data-service-review-rating'] if rating_tag else "Not rated"
+
+            # Extract review date
+            date_tag = review.find(
+                'time', {'data-service-review-date-time-ago': 'true'})
+            review_date = date_tag['datetime'] if date_tag else "Unknown"
+
+            # Extract review title
+            title_tag = review.find(
+                'h2', {'data-service-review-title-typography': 'true'})
+            review_title = title_tag.text.strip() if title_tag else "No title"
+
+            # Extract review content
+            content_tag = review.find(
+                'p', {'data-service-review-text-typography': 'true'})
+            review_content = content_tag.text.strip() if content_tag else "No content"
+
+            # Extract date of experience (if available)
+            experience_date_tag = review.find(
+                'p', {'data-service-review-date-of-experience-typography': 'true'})
+            experience_date = experience_date_tag.text.split(
+                ":")[-1].strip() if experience_date_tag else "Not specified"
+
+            # Extract review link
+            link_tag = review.find(
+                'a', {'data-review-title-typography': 'true'})
+            review_link = "https://www.trustpilot.com" + \
+                link_tag['href'] if link_tag else "No link"
+
+            # Append extracted data to reviews_data list
+            reviews_data.append({
+                "carrier": url.replace(baseUrl, "").split("?")[0],
+                "reviewer_name": reviewer_name,
+                "reviewer_country": reviewer_country,
+                "rating": rating,
+                "review_date": review_date,
+                "review_title": review_title,
+                "review_content": review_content,
+                "experience_date": experience_date,
+                "review_link": review_link
+            })
+
         existing_data = read_existing_data(json_file)
+        existing_data.extend(reviews_data)
 
-        # Append the newly fetched document(s) to the existing data
-        for doc in documents:
-            cleaned_text = "\n".join(
-                line.strip() for line in re.sub(r'\n+', '\n', doc.text).splitlines() if line.strip()
-            )
-            document_data = {
-                'text': cleaned_text,
-                'url': url
-            }
-            existing_data.append(document_data)
-
-        # Write the updated data back to the file
         with open(json_file, 'w', encoding='utf-8') as f:
-            json.dump(existing_data, f, ensure_ascii=False, indent=4)
+            json.dump(existing_data, f, indent=4)
 
         print(f"Fetched and saved {url}")
 
@@ -92,4 +127,4 @@ for idx, url in enumerate(pagesUrls):
     # finally:
     #     continue
 
-print("Documents saved to reviews_scraped_data.json")
+print("Documents saved to structured_reviews_scraped_data.json")
