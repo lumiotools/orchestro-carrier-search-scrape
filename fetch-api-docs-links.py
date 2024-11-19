@@ -28,8 +28,13 @@ visited = set()  # Track visited URLs
 if os.path.exists(LINKS_FILE):
     with open(LINKS_FILE, "r", encoding="utf-8") as f:
         all_links = json.load(f)
-        visited = set(link for company_links in all_links.values()
-                      for link in company_links)
+        visited = set(
+            link
+            for company_links in all_links.values()
+            # Only process company_links with more than 5 links
+            if len(company_links) > 5
+            for link in company_links
+        )
         print(f"Resuming with {len(visited)} already found links.")
 else:
     all_links = {company: [] for company in company_urls}
@@ -128,11 +133,14 @@ def main():
         save_links_to_json(all_links, LINKS_FILE)
 
     
-    for company in company_urls:
-        if company not in all_links:
-            all_links[company] = []
-            
-        
+
+    for index, company in enumerate(company_urls):
+        print(index, "-",company)
+        if index < 0:
+            continue
+        if company not in all_links or len(all_links[company]) > 5:
+            continue
+
         domain = urlparse(f"https://{company}").netloc
 
         # Step 2: Crawl each link to find inner links
