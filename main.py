@@ -6,7 +6,7 @@ load_dotenv()
 
 data = []
 
-with open('cleaned_data.json', 'r', encoding='utf-8') as f:
+with open('json/cleaned_data.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
 
 documents = []

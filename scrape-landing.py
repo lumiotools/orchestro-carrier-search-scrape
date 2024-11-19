@@ -27,7 +27,7 @@ def read_existing_data(file_path):
 
 
 # Path to the JSON file
-json_file = 'data.json'
+json_file = 'json/data.json'
 
 # Iterate over each URL and fetch the content individually
 for idx, url in enumerate(websiteUrls):
@@ -62,4 +62,4 @@ for idx, url in enumerate(websiteUrls):
         print(f"Error occurred while fetching {url}: {e}")
         continue
 
-print("Documents saved to data.json")
+print("Documents saved to json/data.json")

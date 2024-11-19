@@ -12,7 +12,7 @@ def read_existing_data(file_path):
     return []
 
 
-existing_data = read_existing_data("reviews_scraped_data2.json")
+existing_data = read_existing_data("json/reviews_scraped_data2.json")
 
 existing_data = [item for item in existing_data if item.get("text")]
 
@@ -26,6 +26,6 @@ for data in existing_data:
     )
     data['text'] = cleaned_text
     
-with open("cleaned_reviews_data2.json", 'w', encoding='utf-8') as f:
+with open("json/cleaned_reviews_data2.json", 'w', encoding='utf-8') as f:
     json.dump(existing_data, f, ensure_ascii=False, indent=4)
-print("Data cleaned and saved to cleaned_reviews_data2.json")
+print("Data cleaned and saved to json/cleaned_reviews_data2.json")

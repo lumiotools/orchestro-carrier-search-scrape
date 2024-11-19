@@ -43,7 +43,7 @@ def read_existing_data(file_path):
 
 # Path to the JSON file
 #json_file = 'all_pages_data.json'
-json_file = 'data_1.json'
+json_file = 'json/data_1.json'
 
 # Iterate over each URL and fetch the content individually
 for idx, url in enumerate(pagesUrls):
@@ -91,4 +91,4 @@ for idx, url in enumerate(pagesUrls):
     # finally:
     #     continue
 
-print("Documents saved to all_pages_data.json")
+print("Documents saved to json/all_pages_data.json")
