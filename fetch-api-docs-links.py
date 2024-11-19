@@ -114,6 +114,8 @@ def main():
     for company in company_urls:
         if company not in all_links:
             all_links[company] = []
+        if len(all_links[company]) > 0:
+            continue
 
         print(f"Searching for API docs links for {company}...")
         domain = urlparse(f"https://{company}").netloc
@@ -124,6 +126,14 @@ def main():
             if link not in all_links[company]:
                 all_links[company].append(link)
         save_links_to_json(all_links, LINKS_FILE)
+
+    
+    for company in company_urls:
+        if company not in all_links:
+            all_links[company] = []
+            
+        
+        domain = urlparse(f"https://{company}").netloc
 
         # Step 2: Crawl each link to find inner links
         for link in all_links[company]:
