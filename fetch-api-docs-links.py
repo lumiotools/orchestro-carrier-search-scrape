@@ -11,9 +11,12 @@ from extract_sheet1_data import extractSheet1Data
 from extract_sheet2_data import extractSheet2Data
 
 # Input: List of company URLs
-company_urls = extractSheet1Data() + extractSheet2Data()
+company_urls = []
+for company_url in extractSheet2Data():
+    company_urls.append(company_url.replace("https://", "").replace("http://", "").replace("www.", ""))
+    
 # Output JSON file for links
-LINKS_FILE = "api_docs_links.json"
+LINKS_FILE = "api_docs_links_sheet_2.json"
 
 # Settings
 MAX_DEPTH = 2  # Limit the depth of inner link crawling
