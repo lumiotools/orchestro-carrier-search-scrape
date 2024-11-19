@@ -91,7 +91,7 @@ def get_inner_links(url, domain, depth=MAX_DEPTH, lang="en-us"):
                 continue
 
             # Add the link if not visited
-            if normalized_full_url not in visited and "api" in normalized_full_url:
+            if normalized_full_url not in visited:
                 inner_links.append(normalized_full_url)
                 inner_links.extend(get_inner_links(normalized_full_url, domain, depth - 1, lang))
 
