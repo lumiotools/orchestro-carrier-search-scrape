@@ -8,7 +8,7 @@ import time
 
 # Input and Output JSON files
 LINKS_FILE = "api_docs_links_sheet_1.json"
-OUTPUT_FILE = "api_docs_data_sheet_1.json"
+OUTPUT_FILE = "api_docs_data_sheet_1_part_1.json"
 
 options = Options()
 options.add_argument("--headless")  # Run in headless mode for faster execution
@@ -61,12 +61,18 @@ def main():
         links_to_scrape = json.load(f)
 
     final_links = []
+    counter = 0
     for company, links in links_to_scrape.items():
         final_links.extend(links)
-
+    final_links = final_links[:1000]  
     print(f"Total links to scrape: {len(final_links)}")
 
     for index, link in enumerate(final_links):
+        print(counter)
+        counter += 1
+        # if counter > 1000:
+        #     print(f"Reached limit of 1000 links. Exiting...")
+        #     break
         if link in visited:
             print(f"Skipping link {index}/{len(final_links)}: {link}")
             continue
