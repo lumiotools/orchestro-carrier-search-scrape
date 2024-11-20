@@ -68,11 +68,11 @@ def main():
 
     for index, link in enumerate(final_links):
         if link in visited:
-            print(f"Skipping link {index+1}/{len(final_links)}: {link}")
+            print(f"Skipping link {index}/{len(final_links)}: {link}")
             continue
         if index < 0 and index >1000:
             continue
-        print(f"Scraping link {index+1}/{len(final_links)}: {link}")
+        print(f"Scraping link {index}/{len(final_links)}: {link}")
         if link not in visited:
             scrape_page(link)
 
