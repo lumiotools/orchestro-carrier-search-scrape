@@ -12,11 +12,12 @@ from extract_sheet2_data import extractSheet2Data
 
 # Input: List of company URLs
 company_urls = []
-for company_url in extractSheet2Data():
-    company_urls.append(company_url.replace("https://", "").replace("http://", "").replace("www.", ""))
-    
+for company_url in extractSheet1Data():
+    company_urls.append(company_url.replace(
+        "https://", "").replace("http://", "").replace("www.", ""))
+
 # Output JSON file for links
-LINKS_FILE = "api_docs_links_sheet_2.json"
+LINKS_FILE = "api_docs_links_sheet_1.json"
 
 # Settings
 MAX_DEPTH = 2  # Limit the depth of inner link crawling
@@ -69,7 +70,8 @@ def get_inner_links(url, domain, depth=MAX_DEPTH, lang="en-us"):
     inner_links = []
 
     # Normalize the domain for consistent comparison
-    normalized_domain = domain.replace("www.", "")  # Remove 'www.' for consistency
+    normalized_domain = domain.replace(
+        "www.", "")  # Remove 'www.' for consistency
 
     try:
         response = requests.get(normalized_url, headers=HEADERS, timeout=10)
@@ -78,14 +80,19 @@ def get_inner_links(url, domain, depth=MAX_DEPTH, lang="en-us"):
 
         for link in soup.find_all("a", href=True):
             href = link["href"]
+            print(href)
             full_url = urljoin(normalized_url, href)  # Resolve relative URLs
             parsed_url = urlparse(full_url)
 
             # Normalize each link by removing its fragment
-            normalized_full_url = parsed_url._replace(fragment="", query="").geturl()
+            normalized_full_url = parsed_url._replace(
+                fragment="", query="").geturl()
+
+            print(normalized_full_url)
 
             # Detect if the URL contains a language system
-            has_lang = re.search(r"/[a-z]{2}-[a-z]{2}/", normalized_full_url, re.IGNORECASE)
+            has_lang = re.search(
+                r"/[a-z]{2}-[a-z]{2}/", normalized_full_url, re.IGNORECASE)
 
             # Language filtering logic
             if has_lang:
@@ -98,13 +105,13 @@ def get_inner_links(url, domain, depth=MAX_DEPTH, lang="en-us"):
             # Add the link if not visited
             if normalized_full_url not in visited and not ".pdf" in normalized_full_url and not ".xml" in normalized_full_url and not ".xls" in normalized_full_url and not ".xlsx" in normalized_full_url:
                 inner_links.append(normalized_full_url)
-                inner_links.extend(get_inner_links(normalized_full_url, domain, depth - 1, lang))
+                inner_links.extend(get_inner_links(
+                    normalized_full_url, domain, depth - 1, lang))
 
     except Exception as e:
         print(f"Error crawling {url}: {e}")
 
     return list(set(inner_links))  # Deduplicate links
-
 
 
 def save_links_to_json(links, output_file):
@@ -116,27 +123,26 @@ def save_links_to_json(links, output_file):
 
 def main():
     """Main function to fetch and save API documentation links."""
-    for company in company_urls:
-        if company not in all_links:
-            all_links[company] = []
-        if len(all_links[company]) > 0:
-            continue
+    # for company in company_urls:
+    #     if company not in all_links:
+    #         all_links[company] = []
+    #     if len(all_links[company]) > 0:
+    #         continue
 
-        print(f"Searching for API docs links for {company}...")
-        domain = urlparse(f"https://{company}").netloc
+    #     print(f"Searching for API docs links for {company}...")
+    #     domain = urlparse(f"https://{company}").netloc
 
-        # Step 1: Get initial links from Google Search
-        initial_links = find_api_docs_links(company)
-        for link in initial_links:
-            if link not in all_links[company]:
-                all_links[company].append(link)
-        save_links_to_json(all_links, LINKS_FILE)
-
-    
+    #     # Step 1: Get initial links from Google Search
+    #     initial_links = find_api_docs_links(company)
+    #     for link in initial_links:
+    #         if link not in all_links[company]:
+    #             all_links[company].append(link)
+    #     save_links_to_json(all_links, LINKS_FILE)
 
     for index, company in enumerate(company_urls):
-        print(index, "-",company)
-        if index < 0:
+        if company == "tusklogistics.com":
+            print(index, "-", company)
+        if index != 77:
             continue
         if company not in all_links or len(all_links[company]) > 5:
             continue
@@ -148,7 +154,7 @@ def main():
             print(f"Finding inner links for: {link}")
             inner_links = get_inner_links(link, domain, MAX_DEPTH)
             for inner_link in inner_links:
-                if inner_link not in all_links[company]:
+                if inner_link not in all_links[company] and "/reference/" in inner_link:
                     all_links[company].append(inner_link)
             save_links_to_json(all_links, LINKS_FILE)
 

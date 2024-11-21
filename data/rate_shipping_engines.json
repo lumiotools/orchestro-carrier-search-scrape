@@ -1,0 +1,118 @@
+[
+    {
+      "name": "EasyPost",
+      "description": "Offers a comprehensive shipping API that integrates with multiple carriers, providing label generation, tracking, and address verification.",
+      "website": "https://www.easypost.com"
+    },
+    {
+      "name": "Shippo",
+      "description": "Provides a multi-carrier shipping API with features like rate comparison, label creation, and tracking for e-commerce businesses.",
+      "website": "https://goshippo.com"
+    },
+    {
+      "name": "Easyship",
+      "description": "Connects sellers and marketplaces to couriers, offering shipping rate calculations, label generation, and tracking services.",
+      "website": "https://www.easyship.com"
+    },
+    {
+      "name": "AfterShip",
+      "description": "Specializes in shipment tracking and notifications, integrating with various carriers to provide real-time updates.",
+      "website": "https://www.aftership.com"
+    },
+    {
+      "name": "Freightos",
+      "description": "Offers a digital freight platform for comparing and booking international freight services, including air, ocean, and trucking.",
+      "website": "https://www.freightos.com"
+    },
+    {
+      "name": "ClickPost",
+      "description": "Provides a multi-carrier shipping API integrated with over 500 carrier partners, facilitating efficient logistics operations.",
+      "website": "https://www.clickpost.ai"
+    },
+    {
+      "name": "ShipStation",
+      "description": "A web-based shipping solution that integrates with various carriers and e-commerce platforms, offering rate comparison and label printing.",
+      "website": "https://www.shipstation.com"
+    },
+    {
+      "name": "ShippyPro",
+      "description": "Offers a shipping API that connects with multiple carriers, providing rate calculation, label generation, and tracking services.",
+      "website": "https://www.shippypro.com"
+    },
+    {
+      "name": "SendCloud",
+      "description": "A shipping platform that connects e-commerce businesses with multiple carriers, offering rate comparison and label generation.",
+      "website": "https://www.sendcloud.com"
+    },
+    {
+      "name": "ShipHawk",
+      "description": "Provides a shipping API that automates rate shopping, label creation, and tracking for various carriers.",
+      "website": "https://www.shiphawk.com"
+    },
+    {
+      "name": "ShipWorks",
+      "description": "Offers shipping software that integrates with multiple carriers, providing rate comparison, label printing, and tracking.",
+      "website": "https://www.shipworks.com"
+    },
+    {
+      "name": "ShipRush",
+      "description": "Provides shipping solutions that integrate with various carriers, offering rate shopping, label printing, and tracking.",
+      "website": "https://www.shiprush.com"
+    },
+    {
+      "name": "Ordoro",
+      "description": "An e-commerce logistics platform that offers shipping rate comparison, label generation, and tracking across multiple carriers.",
+      "website": "https://www.ordoro.com"
+    },
+    {
+      "name": "MetaPack",
+      "description": "Provides a delivery management platform that connects retailers with carriers, offering rate calculation and tracking services.",
+      "website": "https://www.metapack.com"
+    },
+    {
+      "name": "Parcelhub",
+      "description": "Offers multi-carrier shipping and tracking solutions, providing rate comparison and label generation.",
+      "website": "https://www.parcelhub.co.uk"
+    },
+    {
+      "name": "Shiptheory",
+      "description": "Provides shipping automation software that integrates with various carriers, offering rate calculation and label printing.",
+      "website": "https://www.shiptheory.com"
+    },
+    {
+      "name": "Shipwire",
+      "description": "A fulfillment service that offers shipping rate calculation, label generation, and tracking through multiple carriers.",
+      "website": "https://www.shipwire.com"
+    },
+    {
+      "name": "Stamps.com",
+      "description": "Provides online postage and shipping software, offering rate calculation and label printing for various carriers.",
+      "website": "https://www.stamps.com"
+    },
+    {
+      "name": "Endicia",
+      "description": "Offers shipping solutions with rate calculation, label printing, and tracking, primarily for USPS services.",
+      "website": "https://www.endicia.com"
+    },
+    {
+      "name": "Pitney Bowes",
+      "description": "Provides shipping APIs that offer rate calculation, label generation, and tracking across multiple carriers.",
+      "website": "https://www.pitneybowes.com"
+    },
+    {
+      "name": "XPS Ship",
+      "description": "Offers a shipping platform with rate comparison, label printing, and tracking for various carriers.",
+      "website": "https://www.xpsship.com"
+    },
+    {
+      "name": "Freightify",
+      "description": "Offers a shipping API that connects ocean carrier rates and schedules directly to your software, providing real-time access to freight rates.",
+      "website": "https://www.freightify.com"
+    },
+    {
+      "name": "Searates",
+      "description": "Provides a Ship Schedule API that aggregates shipping schedule data from different carriers, simplifying access to schedules.",
+      "website": "https://www.searates.com"
+    }
+  ]
+  
