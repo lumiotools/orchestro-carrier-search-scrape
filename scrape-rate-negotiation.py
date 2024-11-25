@@ -27,14 +27,17 @@ def clean_url(url):
 
 def initialize_browser():
     """
-    Initialize and return a Selenium WebDriver instance.
+    Initialize and return a Selenium WebDriver instance with log suppression.
     """
     chrome_options = Options()
-    # Comment out the following line to see the browser window
+    # Uncomment to run in headless mode
     # chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--log-level=3")  # Suppress logs
+    chrome_options.add_experimental_option(
+        "excludeSwitches", ["enable-logging"])
     service = Service()  # Replace with your chromedriver path
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
@@ -48,7 +51,7 @@ def google_search_selenium(driver, query, num_results=5):
     driver.get(f"https://www.google.com/search?q={query}&num={num_results}")
 
     # Wait for the page to load
-    time.sleep(2)
+    time.sleep(5)
 
     # Extract links using the same logic as with BeautifulSoup
     links = []
@@ -64,9 +67,24 @@ def google_search_selenium(driver, query, num_results=5):
     return links[:num_results]  # Limit the number of links
 
 
-def save_results_incrementally(carrier, links, output_file="results.json"):
+def extract_text_from_url(driver, url):
     """
-    Save the results incrementally to a JSON file. If the carrier already exists, append new links.
+    Visit a URL using Selenium, extract all the visible text, and return it.
+    """
+    try:
+        driver.get(url)
+        time.sleep(2)  # Wait for the page to load
+        # Extract the visible text
+        text = driver.find_element(By.TAG_NAME, "body").text
+        return text.strip()
+    except Exception as e:
+        print(f"Error extracting text from {url}: {e}")
+        return ""
+
+
+def save_results_incrementally(carrier, article, output_file="results.json"):
+    """
+    Save the results incrementally to a JSON file after each link is processed.
     """
     if os.path.exists(output_file):
         # Load existing data
@@ -79,8 +97,10 @@ def save_results_incrementally(carrier, links, output_file="results.json"):
     carrier_found = False
     for result in results:
         if result["carrier"] == carrier:
-            # Append only unique links
-            result["links"].extend(link for link in links if link not in result["links"])
+            # Append only unique articles
+            existing_urls = {article["url"] for article in result["articles"]}
+            if article["url"] not in existing_urls:
+                result["articles"].append(article)
             carrier_found = True
             break
 
@@ -88,7 +108,7 @@ def save_results_incrementally(carrier, links, output_file="results.json"):
     if not carrier_found:
         results.append({
             "carrier": carrier,
-            "links": links
+            "articles": [article]
         })
 
     # Save back to the file
@@ -107,7 +127,7 @@ def carrier_already_processed(carrier, output_file="results.json"):
         results = json.load(f)
 
     for result in results:
-        if result["carrier"] == carrier and len(result["links"]) > 0:
+        if result["carrier"] == carrier and len(result["articles"]) == 10:
             return True
 
     return False
@@ -115,7 +135,7 @@ def carrier_already_processed(carrier, output_file="results.json"):
 
 def process_carriers(carriers, num_results=5, output_file="results.json", start_index=0):
     """
-    Process each carrier and save results incrementally. Resumes from a specific index.
+    Process each carrier, extract text from articles, and save results incrementally.
     """
     # Initialize the browser once
     driver = initialize_browser()
@@ -128,13 +148,23 @@ def process_carriers(carriers, num_results=5, output_file="results.json", start_
 
             # Skip carriers already processed
             if carrier_already_processed(carrier, output_file):
-                print(f"Skipping already processed carrier: {carrier} ({idx + 1}/{total_carriers})")
+                print(f"Skipping already processed carrier: {
+                      carrier} ({idx + 1}/{total_carriers})")
                 continue
 
-            query = f'("optimizing shipping rates" OR "reduce shipping costs" OR "logistics efficiency") AND ("{carrier}" OR {carrier}) site:.com -filetype:pdf -filetype:doc -filetype:ppt -site:youtube.com -site:wikipedia.org'
+            query = f'("optimizing shipping rates" OR "reduce shipping costs" OR "logistics efficiency") AND ("{carrier}" OR {
+                carrier}) site:.com -filetype:pdf -filetype:doc -filetype:ppt -site:youtube.com -site:wikipedia.org'
             links = google_search_selenium(driver, query, num_results)
-            save_results_incrementally(carrier, links, output_file)
-            print(f"Saved results for carrier: {carrier} ({idx + 1}/{total_carriers})")
+
+            total_links = len(links)
+            for link_idx, link in enumerate(links, start=1):
+                # Extract text from the link
+                text = extract_text_from_url(driver, link)
+                if text:  # Only save non-empty text
+                    article = {"url": link, "text": text}
+                    save_results_incrementally(carrier, article, output_file)
+                    print(f"Saved article for carrier: {carrier} ({
+                          idx + 1}/{total_carriers}), Link: {link_idx}/{total_links}")
     finally:
         driver.quit()
 
@@ -143,4 +173,5 @@ def process_carriers(carriers, num_results=5, output_file="results.json", start_
 carriers = extractSheet1Data() + extractSheet2Data()
 
 # Process carriers and save results incrementally
-process_carriers(carriers, num_results=10, output_file="carriers-rate-negotiation.json", start_index=0)
+process_carriers(carriers, num_results=10,
+                 output_file="carriers-rate-negotiation.json", start_index=0)
