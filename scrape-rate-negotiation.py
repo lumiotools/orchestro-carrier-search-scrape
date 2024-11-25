@@ -82,54 +82,62 @@ def extract_text_from_url(driver, url):
         return ""
 
 
-def save_results_incrementally(carrier, article, output_file="results.json"):
+def load_existing_results(output_file="results.json"):
     """
-    Save the results incrementally to a JSON file after each link is processed.
+    Load existing results from the JSON file into memory.
     """
     if os.path.exists(output_file):
-        # Load existing data
         with open(output_file, "r") as f:
-            results = json.load(f)
-    else:
-        results = []
+            return json.load(f)
+    return []
 
-    # Check if carrier already exists
-    carrier_found = False
+
+def save_results_to_file(results, output_file="results.json"):
+    """
+    Save the in-memory results to the JSON file.
+    """
+    with open(output_file, "w") as f:
+        json.dump(results, f, indent=4)
+
+
+def link_already_processed(carrier, url, results):
+    """
+    Check if a link for the carrier already exists in the in-memory JSON data.
+    """
+    for result in results:
+        if result["carrier"] == carrier:
+            for article in result["articles"]:
+                if article["url"] == url:
+                    return True
+    return False
+
+
+def save_article_to_results(carrier, article, results):
+    """
+    Save an article to the in-memory JSON data.
+    """
     for result in results:
         if result["carrier"] == carrier:
             # Append only unique articles
             existing_urls = {article["url"] for article in result["articles"]}
             if article["url"] not in existing_urls:
                 result["articles"].append(article)
-            carrier_found = True
-            break
+            return
 
     # If carrier doesn't exist, add a new entry
-    if not carrier_found:
-        results.append({
-            "carrier": carrier,
-            "articles": [article]
-        })
-
-    # Save back to the file
-    with open(output_file, "w") as f:
-        json.dump(results, f, indent=4)
+    results.append({
+        "carrier": carrier,
+        "articles": [article]
+    })
 
 
-def carrier_already_processed(carrier, output_file="results.json"):
+def carrier_already_processed(carrier, results):
     """
-    Check if a carrier has already been processed by looking into the JSON file.
+    Check if a carrier has already been processed by looking into the in-memory JSON data.
     """
-    if not os.path.exists(output_file):
-        return False
-
-    with open(output_file, "r") as f:
-        results = json.load(f)
-
     for result in results:
         if result["carrier"] == carrier and len(result["articles"]) == 10:
             return True
-
     return False
 
 
@@ -137,6 +145,9 @@ def process_carriers(carriers, num_results=5, output_file="results.json", start_
     """
     Process each carrier, extract text from articles, and save results incrementally.
     """
+    # Load existing results into memory
+    results = load_existing_results(output_file)
+
     # Initialize the browser once
     driver = initialize_browser()
 
@@ -147,26 +158,32 @@ def process_carriers(carriers, num_results=5, output_file="results.json", start_
             carrier = clean_url(carrier_url)
 
             # Skip carriers already processed
-            if carrier_already_processed(carrier, output_file):
-                print(f"Skipping already processed carrier: {
-                      carrier} ({idx + 1}/{total_carriers})")
+            if carrier_already_processed(carrier, results):
+                print(f"Skipping already processed carrier: {carrier} ({idx + 1}/{total_carriers})")
                 continue
 
-            query = f'("optimizing shipping rates" OR "reduce shipping costs" OR "logistics efficiency") AND ("{carrier}" OR {
-                carrier}) site:.com -filetype:pdf -filetype:doc -filetype:ppt -site:youtube.com -site:wikipedia.org'
+            query = f'("optimizing shipping rates" OR "reduce shipping costs" OR "logistics efficiency") AND ("{carrier}" OR {carrier}) site:.com -filetype:pdf -filetype:doc -filetype:ppt -site:youtube.com -site:wikipedia.org -site:linkedin.com'
             links = google_search_selenium(driver, query, num_results)
 
             total_links = len(links)
             for link_idx, link in enumerate(links, start=1):
+                # Skip link if already processed
+                if link_already_processed(carrier, link, results):
+                    print(f"Skipping already processed link: {link} for carrier: {carrier} ({link_idx}/{total_links})")
+                    continue
+
                 # Extract text from the link
                 text = extract_text_from_url(driver, link)
                 if text:  # Only save non-empty text
                     article = {"url": link, "text": text}
-                    save_results_incrementally(carrier, article, output_file)
+                    save_article_to_results(carrier, article, results)
+                    save_results_to_file(results, output_file)
                     print(f"Saved article for carrier: {carrier} ({
                           idx + 1}/{total_carriers}), Link: {link_idx}/{total_links}")
     finally:
         driver.quit()
+        # Ensure the final results are saved to the file
+        save_results_to_file(results, output_file)
 
 
 # List of carrier URLs
