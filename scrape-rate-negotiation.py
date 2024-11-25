@@ -190,5 +190,5 @@ def process_carriers(carriers, num_results=5, output_file="results.json", start_
 carriers = extractSheet1Data() + extractSheet2Data()
 
 # Process carriers and save results incrementally
-process_carriers(carriers, num_results=10,
-                 output_file="carriers-rate-negotiation.json", start_index=0)
+process_carriers(carriers[:250], num_results=10,
+                 output_file="carriers-rate-negotiation-set-5.json", start_index=200)
